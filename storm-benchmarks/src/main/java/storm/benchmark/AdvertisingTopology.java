@@ -44,12 +44,10 @@ public class AdvertisingTopology {
     public static class DeserializeBolt extends BaseRichBolt {
         OutputCollector _collector;
 
-        @Override
         public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
             _collector = collector;
         }
 
-        @Override
         public void execute(Tuple tuple) {
 
             JSONObject obj = new JSONObject(tuple.getString(0));
@@ -63,7 +61,6 @@ public class AdvertisingTopology {
             _collector.ack(tuple);
         }
 
-        @Override
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declare(new Fields("user_id", "page_id", "ad_id", "ad_type", "event_type", "event_time", "ip_address"));
         }
@@ -72,12 +69,10 @@ public class AdvertisingTopology {
     public static class EventFilterBolt extends BaseRichBolt {
         OutputCollector _collector;
 
-        @Override
         public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
             _collector = collector;
         }
 
-        @Override
         public void execute(Tuple tuple) {
             if(tuple.getStringByField("event_type").equals("view")) {
                 _collector.emit(tuple, tuple.getValues());
@@ -85,7 +80,7 @@ public class AdvertisingTopology {
             _collector.ack(tuple);
         }
 
-        @Override
+        
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declare(new Fields("user_id", "page_id", "ad_id", "ad_type", "event_type", "event_time", "ip_address"));
         }
@@ -94,19 +89,19 @@ public class AdvertisingTopology {
     public static class EventProjectionBolt extends BaseRichBolt {
         OutputCollector _collector;
 
-        @Override
+        
         public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
             _collector = collector;
         }
 
-        @Override
+        
         public void execute(Tuple tuple) {
             _collector.emit(tuple, new Values(tuple.getStringByField("ad_id"),
                                               tuple.getStringByField("event_time")));
             _collector.ack(tuple);
         }
 
-        @Override
+        
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declare(new Fields("ad_id", "event_time"));
         }
@@ -127,7 +122,7 @@ public class AdvertisingTopology {
             this.redisAdCampaignCache.prepare();
         }
 
-        @Override
+        
         public void execute(Tuple tuple) {
             String ad_id = tuple.getStringByField("ad_id");
             String campaign_id = this.redisAdCampaignCache.execute(ad_id);
@@ -141,7 +136,7 @@ public class AdvertisingTopology {
             _collector.ack(tuple);
         }
 
-        @Override
+        
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declare(new Fields("campaign_id", "ad_id", "event_time"));
         }
@@ -165,7 +160,7 @@ public class AdvertisingTopology {
             this.campaignProcessorCommon.prepare();
         }
 
-        @Override
+        
         public void execute(Tuple tuple) {
 
             String campaign_id = tuple.getStringByField("campaign_id");
@@ -175,7 +170,7 @@ public class AdvertisingTopology {
             _collector.ack(tuple);
         }
 
-        @Override
+        
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
         }
     }
